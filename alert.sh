@@ -9,8 +9,7 @@ if [ -f .env ]; then
 fi
 
 # sends a webhook alert if drift is detected in the diff JSON
-# usage: alert.sh <diff.json> <webhook_url>
-# or set WEBHOOK_URL env var
+# usage: alert.sh <diff.json>
 # exit code: 0 = alert sent or no drift, 1 = HTTP error, 2 = usage error
 
 usage() {
