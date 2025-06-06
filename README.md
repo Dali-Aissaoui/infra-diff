@@ -95,18 +95,9 @@ docker run --rm \
 
 ---
 
-TMP=$(mktemp)
-echo '{"foo": 1}' > "$TMP"
-jq -n --slurpfile data "$TMP" '{data: $data[0]}'
-rm -f "$TMP"
-```
-
----
-
 ## Troubleshooting
 
-- **Permission denied**: Ensure scripts are executable (`chmod +x ...`).
-- **jq: Argument list too long**: This is solved by using temp files and `--slurpfile`.
+- **Permission denied**: Ensure scripts are executable.
 - **No Docker info**: If running in Docker, mount the host Docker socket.
 - **No alerts**: Check your `WEBHOOK_URL` and network connectivity.
 
