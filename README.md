@@ -2,18 +2,7 @@
 
 ## Overview
 
-**infra-diff** is a modular, container-ready Bash toolkit for infrastructure snapshotting, drift detection, and alerting. It captures detailed system state (including Docker, network, services, users, scheduled tasks, and more), detects changes over time, and can send webhook alerts on drift. Designed for both VPS (host) and Dockerized environments, it features robust error handling, JSON output, and easy scheduling.
-
----
-
-## Features
-
-- **Comprehensive Snapshots**: Captures Docker, network, OS, users/groups, cron, and file integrity info as JSON.
-- **Drift Detection**: Compares snapshots, outputs categorized diffs.
-- **Webhook Alerting**: Sends POST requests with drift details to a configurable webhook.
-- **Containerized & Host Support**: Runs natively on VPS or inside Docker (with host Docker socket).
-- **Automated Scheduling**: Orchestrator script (`entrypoint.sh`) supports periodic runs.
-- **Robust & Scalable**: Handles large outputs efficiently using temp files and `jq --slurpfile`.
+**infra-diff** is a modular, container-ready Bash toolkit for infrastructure snapshotting, drift detection, and alerting. It captures detailed system state, detects changes over time, and can send webhook alerts on drift.
 
 ---
 
@@ -106,34 +95,6 @@ docker run --rm \
 
 ---
 
-## Directory Structure
-
-```
-infra-diff/
-├── snapshot.sh        # Collects system snapshot as JSON
-├── diff.sh            # Compares two snapshots, outputs drift
-├── alert.sh           # Sends webhook alert if drift detected
-├── entrypoint.sh      # Orchestrates periodic snapshot/diff/alert
-├── Dockerfile         # Container build
-├── .env               # Your environment config (not committed)
-├── .env.example       # Example env config
-├── snapshots/         # (default) Snapshots & diffs (gitignored)
-└── ...
-```
-
----
-
-## mktemp: What & Why
-
-`mktemp` is a Unix command that creates a unique temporary file or directory. In this project, it's used to:
-
-- **Safely handle large outputs**: Instead of passing big data as shell arguments (which can hit system limits and cause errors), each collector writes its JSON to a temp file.
-- **Efficiently assemble JSON**: The main script then loads these temp files into `jq` using `--slurpfile`, ensuring robust and scalable processing.
-- **Automatic cleanup**: Temp files are deleted after use, keeping your system tidy.
-
-**Example:**
-
-```bash
 TMP=$(mktemp)
 echo '{"foo": 1}' > "$TMP"
 jq -n --slurpfile data "$TMP" '{data: $data[0]}'
