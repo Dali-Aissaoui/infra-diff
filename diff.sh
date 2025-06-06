@@ -30,23 +30,26 @@ diff_section() {
       --arg section "$section" \
       '
       def diff(a; b):
-        if (a == null) and (b == null) then null
+        if (a == null and b == null) then null
         elif (a == null) then {added: b}
         elif (b == null) then {removed: a}
         elif (a == b) then null
-        elif ( (a|type) == "array" and (b|type) == "array" ) then
+        elif ((a|type) == "array" and (b|type) == "array") then
           {added: (b - a), removed: (a - b)} | select(.added != [] or .removed != [])
-        elif ( (a|type) == "object" and (b|type) == "object" ) then
+        elif ((a|type) == "object" and (b|type) == "object") then
           reduce (a|keys_unsorted + b|keys_unsorted | unique[]) as $k ({};
-            . + if (a[$k] == null) then {($k): {added: b[$k]}} elif (b[$k] == null) then {($k): {removed: a[$k]}} elif (a[$k] != b[$k]) then {($k): {from: a[$k], to: b[$k]}} else {} end
+            . + (if (a[$k] == null) then {($k): {added: b[$k]}}
+                 elif (b[$k] == null) then {($k): {removed: a[$k]}}
+                 elif (a[$k] != b[$k]) then {($k): {from: a[$k], to: b[$k]}}
+                 else {} end)
           ) | select(length > 0)
-        else {from: a, to: b};
+        else {from: a, to: b}
       end;
       {
         section: $section,
         diff: diff($a[$section]; $b[$section])
       } | select(.diff != null)'
-}
+
 
 # --- compare all top-level sections ---
 SECTIONS=(

@@ -24,9 +24,13 @@ while true; do
     if [ -n "$LAST_SNAPSHOT" ]; then
         DIFF_FILE="$SNAPSHOT_DIR/diff_$TIMESTAMP.json"
         log "comparing $LAST_SNAPSHOT to $SNAPSHOT_FILE"
-        ./diff.sh "$LAST_SNAPSHOT" "$SNAPSHOT_FILE" > "$DIFF_FILE" || true
-        log "alerting if drift detected..."
-        ./alert.sh "$DIFF_FILE"
+        if ./diff.sh "$LAST_SNAPSHOT" "$SNAPSHOT_FILE" > "$DIFF_FILE"; then
+            log "no drift detected."
+            rm -f "$DIFF_FILE"
+        else
+            log "alerting: drift detected!"
+            ./alert.sh "$DIFF_FILE"
+        fi
         rm -f "$LAST_SNAPSHOT"
     fi
     LAST_SNAPSHOT="$SNAPSHOT_FILE"
